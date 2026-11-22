@@ -1,6 +1,7 @@
 # AI Troubleshooting Assistant for L1/L2 Support
 
 Live demo: https://ai-troubleshooting-assistant-nnxqib8kmsk9zt45tiforx.streamlit.app
+
 A simple chat assistant that helps support engineers investigate common technical issues. The user describes a problem in plain language; the assistant finds the most relevant entry in a small knowledge base, suggests step-by-step troubleshooting checks, names the likely escalation team, and shows which knowledge-base entry it used. If the knowledge base does not cover the issue, it says so and asks for more information instead of guessing.
 
 > Practical AI Assignment 3, Technology Operations Intern. Uses sample/simulated data only.
