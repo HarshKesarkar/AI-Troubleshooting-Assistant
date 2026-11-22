@@ -1,0 +1,195 @@
+[
+  {
+    "id": "KB-001",
+    "title": "Payment API returning HTTP 500 errors",
+    "category": "Application / API",
+    "symptoms": [
+      "payment API returns 500 internal server error",
+      "checkout fails intermittently",
+      "spike in 5xx responses on payment endpoint"
+    ],
+    "keywords": ["payment", "api", "500", "5xx", "internal server error", "checkout", "transaction"],
+    "diagnostic_checks": [
+      "Review application logs for stack traces around the time of the first 500 response.",
+      "Check recent deployments or config changes to the payment service.",
+      "Verify downstream dependencies (database, payment gateway, auth service) are healthy.",
+      "Check API gateway and load balancer logs to see if errors come from one node or all nodes.",
+      "Confirm CPU, memory and thread-pool usage on the payment service hosts."
+    ],
+    "resolution": "If a recent release caused the errors, roll back to the last stable version. If a dependency is down, restore it or enable the fallback route, then restart the payment service and monitor the 5xx rate.",
+    "escalation_team": "Payments Application Support (L3)"
+  },
+  {
+    "id": "KB-002",
+    "title": "Database connection timeouts / connection pool exhausted",
+    "category": "Database",
+    "symptoms": [
+      "application logs show connection timeout to database",
+      "too many connections error",
+      "requests hang waiting for a DB connection"
+    ],
+    "keywords": ["database", "db", "connection", "timeout", "pool", "exhausted", "too many connections", "sql", "hang"],
+    "diagnostic_checks": [
+      "Check the number of active connections against the configured maximum.",
+      "Look for long-running or blocked queries on the database.",
+      "Confirm the application is releasing connections (check for leaks in logs).",
+      "Verify network connectivity and latency between the app server and the database.",
+      "Check whether the database server is under CPU, memory or disk pressure."
+    ],
+    "resolution": "Terminate blocked sessions, restart the application to release leaked connections, and temporarily raise the pool size if the database can handle it. Raise a bug for any connection leak found.",
+    "escalation_team": "Database Administration (DBA) Team"
+  },
+  {
+    "id": "KB-003",
+    "title": "High CPU utilisation on application server",
+    "category": "Infrastructure",
+    "symptoms": [
+      "server CPU stays above 90 percent",
+      "application is slow and unresponsive",
+      "monitoring alert for high CPU"
+    ],
+    "keywords": ["cpu", "high cpu", "utilisation", "utilization", "server", "slow", "load", "process", "100%"],
+    "diagnostic_checks": [
+      "Identify the top CPU-consuming processes (top / htop / Task Manager).",
+      "Check whether the spike matches a deployment, batch job or traffic surge.",
+      "Look for runaway threads or infinite loops in application logs.",
+      "Compare with other nodes in the cluster to see if the issue is isolated."
+    ],
+    "resolution": "Restart the offending process if it is hung, scale out or move traffic away from the affected node, and capture a thread dump before restarting for root-cause analysis.",
+    "escalation_team": "Infrastructure / SRE Team"
+  },
+  {
+    "id": "KB-004",
+    "title": "Disk space full on server",
+    "category": "Infrastructure",
+    "symptoms": [
+      "no space left on device",
+      "application cannot write logs or files",
+      "disk usage alert above 95 percent"
+    ],
+    "keywords": ["disk", "space", "full", "storage", "no space left", "logs", "volume", "partition"],
+    "diagnostic_checks": [
+      "Run df -h to find which partition is full.",
+      "Use du to locate the largest directories (often /var/log or temp folders).",
+      "Check whether log rotation is configured and working.",
+      "Look for large core dumps or stale backup files."
+    ],
+    "resolution": "Archive or delete old logs and temp files, fix log rotation, and extend the volume if growth is legitimate. Restart affected services after space is freed.",
+    "escalation_team": "Infrastructure / SRE Team"
+  },
+  {
+    "id": "KB-005",
+    "title": "SSL/TLS certificate expired or handshake failure",
+    "category": "Security / Network",
+    "symptoms": [
+      "browser shows certificate expired warning",
+      "SSL handshake failed error",
+      "service-to-service calls fail with certificate errors"
+    ],
+    "keywords": ["ssl", "tls", "certificate", "expired", "handshake", "https", "cert", "untrusted"],
+    "diagnostic_checks": [
+      "Check the certificate expiry date (openssl s_client or browser details).",
+      "Verify the full certificate chain, including intermediate certificates, is installed.",
+      "Confirm the hostname matches the certificate's CN/SAN.",
+      "Check whether the client trust store is missing the issuing CA."
+    ],
+    "resolution": "Renew and install the certificate with the full chain, then reload the web server or load balancer. Add the certificate to expiry monitoring.",
+    "escalation_team": "Security & Network Operations"
+  },
+  {
+    "id": "KB-006",
+    "title": "User unable to log in / SSO failure / account locked",
+    "category": "Identity & Access",
+    "symptoms": [
+      "user cannot log in",
+      "account locked after failed attempts",
+      "SSO redirect loop or authentication error"
+    ],
+    "keywords": ["login", "log in", "sso", "password", "locked", "account", "authentication", "access", "credentials"],
+    "diagnostic_checks": [
+      "Confirm the username and check whether the account is locked or disabled.",
+      "Check whether the password has expired.",
+      "Look at authentication logs for the exact failure reason.",
+      "Test login from a different browser or network to rule out client-side issues.",
+      "For SSO, verify the identity provider is reachable and system clocks are in sync."
+    ],
+    "resolution": "Unlock the account or reset the password after identity verification. For SSO issues, clear browser cookies and re-test; if the IdP is failing, escalate.",
+    "escalation_team": "Identity & Access Management (IAM) Team"
+  },
+  {
+    "id": "KB-007",
+    "title": "Emails or notifications not being delivered",
+    "category": "Messaging",
+    "symptoms": [
+      "customers are not receiving emails",
+      "SMTP errors in application logs",
+      "notification queue is growing"
+    ],
+    "keywords": ["email", "smtp", "mail", "notification", "delivery", "queue", "bounce", "not received"],
+    "diagnostic_checks": [
+      "Check application logs for SMTP connection or authentication errors.",
+      "Check the mail queue size and look for stuck messages.",
+      "Verify SMTP server reachability and credentials.",
+      "Check for bounces, spam filtering, or SPF/DKIM failures."
+    ],
+    "resolution": "Fix SMTP credentials or connectivity, flush or requeue stuck messages, and correct SPF/DKIM records if mail is being rejected.",
+    "escalation_team": "Messaging Platform Team"
+  },
+  {
+    "id": "KB-008",
+    "title": "Application slow response / high latency",
+    "category": "Application / Performance",
+    "symptoms": [
+      "pages or APIs take several seconds to respond",
+      "response time alerts firing",
+      "users report the application is slow"
+    ],
+    "keywords": ["slow", "latency", "response time", "performance", "lag", "delay", "timeout"],
+    "diagnostic_checks": [
+      "Check response-time metrics to see whether the slowness is global or one endpoint.",
+      "Check database query times and external API call durations.",
+      "Review CPU, memory and garbage collection on the application hosts.",
+      "Check for recent traffic spikes or deployments."
+    ],
+    "resolution": "Address the bottleneck found (slow query, saturated host, slow dependency). Scale out if load is the cause, or roll back a recent change that introduced the regression.",
+    "escalation_team": "Application Performance / SRE Team"
+  },
+  {
+    "id": "KB-009",
+    "title": "Scheduled batch job failed or stuck",
+    "category": "Batch / Scheduling",
+    "symptoms": [
+      "nightly job did not complete",
+      "job stuck in running state",
+      "scheduler shows failed status"
+    ],
+    "keywords": ["batch", "job", "scheduler", "cron", "scheduled", "stuck", "failed", "nightly", "etl"],
+    "diagnostic_checks": [
+      "Open the job logs and find the first error.",
+      "Check whether input files or upstream jobs were available on time.",
+      "Verify the job's service account and permissions.",
+      "Check for a lock file or an earlier instance still running."
+    ],
+    "resolution": "Fix the underlying cause (missing input, permissions, lock), then rerun the job manually following the runbook and confirm downstream jobs are triggered.",
+    "escalation_team": "Batch & Scheduling Operations"
+  },
+  {
+    "id": "KB-010",
+    "title": "Service fails to start after deployment",
+    "category": "Deployment / DevOps",
+    "symptoms": [
+      "service crashes right after deployment",
+      "CrashLoopBackOff in Kubernetes",
+      "application exits with configuration error"
+    ],
+    "keywords": ["deployment", "deploy", "start", "crash", "crashloopbackoff", "kubernetes", "container", "config", "release", "startup"],
+    "diagnostic_checks": [
+      "Read the startup logs for the exact error message.",
+      "Compare configuration and environment variables with the previous working release.",
+      "Check that required secrets, files and dependent services are available.",
+      "For containers, check resource limits and image tag / version."
+    ],
+    "resolution": "Correct the configuration or missing dependency and redeploy. If the cause is not quickly found, roll back to the previous version.",
+    "escalation_team": "DevOps / Release Engineering"
+  }
+]
